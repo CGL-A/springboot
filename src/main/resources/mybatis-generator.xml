@@ -5,7 +5,7 @@
 
 <generatorConfiguration>
 
-    <context id="DB2Tables" targetRuntime="MyBatis3" defaultModelType="flat">
+    <context id="DB2Tables" targetRuntime="MyBatis3Simple" defaultModelType="flat">
       <!--  <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
           &lt;!&ndash;  <property name="searchString" value="[e|E]xample$" />
             <property name="replaceString" value="Criteria" />&ndash;&gt;
@@ -48,11 +48,11 @@
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
-        <table tableName="user"
-               domainObjectName="User" >
-            <!--enableCountByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               enableUpdateByExample="false"-->
+        <table tableName="menu"
+               enableCountByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
+               enableUpdateByExample="true" >
+
         </table>
     </context>
 </generatorConfiguration>

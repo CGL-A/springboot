@@ -1,7 +1,5 @@
 package com.chbtc.springboot.service.impl;
 
-import com.chbtc.springboot.mapper.UserMapper;
-import com.chbtc.springboot.model.User;
 import com.chbtc.springboot.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
