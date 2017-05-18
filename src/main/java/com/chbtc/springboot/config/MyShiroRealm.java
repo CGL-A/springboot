@@ -1,5 +1,9 @@
 package com.chbtc.springboot.config;
 
+import com.chbtc.springboot.model.Menu;
+import com.chbtc.springboot.model.User;
+import com.chbtc.springboot.service.IMenuService;
+import com.chbtc.springboot.service.IUserService;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -9,16 +13,26 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by chbtc on 2017/5/17.
  */
-public class MyShiroRealm   extends AuthorizingRealm{
+public class MyShiroRealm extends AuthorizingRealm {
 
+
+    @Autowired
+    IUserService iUserService;
+    @Autowired
+    IMenuService iMenuService;
 
     /**
      * 认证信息.(身份验证)
      * Authentication 是用来验证用户身份
+     *
      * @param token
      * @return
      * @throws AuthenticationException
@@ -30,12 +44,12 @@ public class MyShiroRealm   extends AuthorizingRealm{
         //System.out.println("MyShiroRealm.doGetAuthenticationInfo()");
 
         //获取用户的输入的账号.
-        String username = (String)token.getPrincipal();
+        String username = (String) token.getPrincipal();
         //System.out.println("用户的账号:"+username);
 
         //通过username从数据库中查找 ManagerInfo对象
         //实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法
-        // TODO: 2017/5/17  ManagerInfo managerInfo = managerInfoService.findByUsername(username);
+        User user = iUserService.findByName(username);
 
 //        System.out.println("----->>managerInfo="+managerInfo.toString());
       /*if(managerInfo == null){
@@ -43,25 +57,25 @@ public class MyShiroRealm   extends AuthorizingRealm{
         }*/
 
         //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以自定义实现
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-               /* managerInfo, //用户名
-                managerInfo.getPassword(), //密码
-                ByteSource.Util.bytes(managerInfo.getCredentialsSalt()),//salt=username+salt
-                getName()  //realm name*/
+ /*       SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+                user, //用户名
+                user.getPassword(), //密码
+                ByteSource.Util.bytes(user.getUsername()+"eteokues"),//salt=username+salt
+                getName()  //realm name
         );
-
-        //明文: 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
-//        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-//                managerInfo, //用户名
-//                managerInfo.getPassword(), //密码
-//                getName()  //realm name
-//        );
+*/
+        // 明文: 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+                user, //用户名
+                user.getPassword(), //密码
+                getName()  //realm name
+        );
         return authenticationInfo;
     }
 
     /**
      * 此方法调用  hasRole,hasPermission的时候才会进行回调.
-     *
+     * <p>
      * 权限信息.(授权):
      * 1、如果用户正常退出，缓存自动清空；
      * 2、如果用户非正常退出，缓存自动清空；
@@ -70,6 +84,7 @@ public class MyShiroRealm   extends AuthorizingRealm{
      * 在权限修改后调用realm中的方法，realm已经由spring管理，所以从spring中获取realm实例，
      * 调用clearCached方法；
      * :Authorization 是授权访问控制，用于对用户进行的操作授权，证明该用户是否允许进行当前操作，如访问某个链接，某个资源文件等。
+     *
      * @param principals
      * @return
      */
@@ -84,21 +99,22 @@ public class MyShiroRealm   extends AuthorizingRealm{
         //System.out.println("权限配置-->MyShiroRealm.doGetAuthorizationInfo()");
 
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-/*        ManagerInfo managerInfo  = (ManagerInfo)principals.getPrimaryPrincipal();
-
+        // managerInfo  = (ManagerInfo)principals.getPrimaryPrincipal();
+        User userInfo = (User) principals.getPrimaryPrincipal();
         //实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法
-//     UserInfo userInfo = userInfoService.findByUsername(username)
+        // User userInfo = iUserService.findByName(username);
 
         //设置相应角色的权限信息
-        for(SysRole role:managerInfo.getRoles()){
+      /*  for (SysRole role : managerInfo.getRoles()) {
             //设置角色
             authorizationInfo.addRole(role.getRole());
-            for(SysPermission p:role.getPermissions()){
+            for (SysPermission p : role.getPermissions()) {
                 //设置权限
                 authorizationInfo.addStringPermission(p.getPermission());
             }
         }*/
-
+       Set<String> menuList=iMenuService.getMenuByUserId(userInfo.getUid());
+        authorizationInfo.addStringPermissions(menuList);
         return authorizationInfo;
     }
 }

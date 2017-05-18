@@ -35,4 +35,8 @@
     select mid, mname, pid, sort, url
     from menu
   </select>
+  <select id="getMenuByUserId"  resultType="java.lang.String" parameterType="java.lang.Integer">
+    SELECT  m.mname from menu m LEFT JOIN menu_role mr on m.mid=mr.mid
+left join user_role ur on mr.rid=ur.rid WHERE ur.uid=#{uid,jdbcType=INTEGER}
+  </select>
 </mapper>

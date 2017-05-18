@@ -27,6 +27,11 @@
     from user
     where uid = #{uid,jdbcType=INTEGER}
   </select>
+  <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select uid, username, password
+    from user
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select uid, username, password
     from user

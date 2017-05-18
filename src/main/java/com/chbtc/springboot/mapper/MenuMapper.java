@@ -2,6 +2,7 @@ package com.chbtc.springboot.mapper;
 
 import com.chbtc.springboot.model.Menu;
 import java.util.List;
+import java.util.Set;
 
 public interface MenuMapper {
     int deleteByPrimaryKey(Integer mid);
@@ -13,4 +14,7 @@ public interface MenuMapper {
     List<Menu> selectAll();
 
     int updateByPrimaryKey(Menu record);
+
+    Set<String> getMenuByUserId(Integer uid);
+
 }
